@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: bybit-bot-service
+  telebot:
+    enabled: true
+    token: ${no_default_token}
+    username: ${no_default_token_username}
+  kafka:
+    bootstrap-servers: http://kafka:29092
+    producer:
+      acks: all
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      properties:
+        enable.idempotence: false
+    consumer:
+      group-id: ${spring.application.name}
+      max-poll-records: 100
+      isolation-level: READ_COMMITTED
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      properties:
+        max.poll.interval.ms: 600000
+
+bybit-calculator:
+  url: http://gateway:8080/bybit-calculator
+
+eureka:
+  client:
+    jersey:
+      enabled: false
+    service-url:
+      defaultZone: http://registry:8089/eureka
+  instance:
+    instance-id: ${spring.application.name}:${random.value}
+
+server:
+  port: 8085
