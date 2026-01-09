@@ -15,7 +15,7 @@ import sry.mail.BybitBotService.util.GetBybitUrlBySymbolUtils;
 @RequiredArgsConstructor
 public class UserNotificationEventConsumer {
 
-    private static final String BUY_MESSAGE_TEMPLATE = "Привет, начался памп спота %s, вот ссылка %s";
+    private static final String BUY_MESSAGE_TEMPLATE = "Привет, начался дамп спота %s, пора покупать, вот ссылка %s";
     private static final String SELL_MESSAGE_TEMPLATE = "Привет, пора продавать спот %s вот ссылка %s";
 
     private final ObjectMapper objectMapper;

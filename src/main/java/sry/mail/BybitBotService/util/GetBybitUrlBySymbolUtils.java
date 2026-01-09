@@ -10,7 +10,10 @@ public class GetBybitUrlBySymbolUtils {
     public static String getBybitSpotUrlBySymbol(String symbol) {
         if (symbol.startsWith("USD")) {
             return String.format(BYBIT_SPOT_URL_FORMAT, symbol.substring(0, 3), symbol.substring(4));
+        } else if (symbol.contains("USD")) {
+            return String.format(BYBIT_SPOT_URL_FORMAT, symbol.substring(0, symbol.length() - 4), symbol.substring(symbol.length() - 4));
+        } else {
+            return String.format(BYBIT_SPOT_URL_FORMAT, symbol.substring(0, symbol.length() - 3), symbol.substring(symbol.length() - 3));
         }
-        return String.format(BYBIT_SPOT_URL_FORMAT, symbol.substring(0, symbol.length() - 4), symbol.substring(symbol.length() - 4));
     }
 }

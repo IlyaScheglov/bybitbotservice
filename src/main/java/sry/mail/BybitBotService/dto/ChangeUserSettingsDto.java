@@ -9,8 +9,9 @@ import java.math.BigDecimal;
 @Value
 @Builder
 @Jacksonized
-public class CreateUserRequestDto {
+public class ChangeUserSettingsDto {
 
     String tgId;
-    String apiKey;
+    BigDecimal minPercentOfDump;
+    BigDecimal minPercentOfIncome;
 }

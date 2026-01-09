@@ -6,6 +6,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import ru.ilyxxxa.server.telegrambotstarter.strategy.NoCommandAnswer;
 import sry.mail.BybitBotService.client.PurchaseFeignClient;
 import sry.mail.BybitBotService.client.UserFeignClient;
+import sry.mail.BybitBotService.dto.ChangeUserSettingsDto;
 import sry.mail.BybitBotService.dto.CreateUserRequestDto;
 import sry.mail.BybitBotService.dto.PurchaseRequestDto;
 
@@ -27,6 +28,8 @@ public class NotSimpleCommandStrategy extends NoCommandAnswer {
 
         if (messageFromUser.startsWith("/register")) {
             return registerUser(messageFromUser, chatId);
+        } else if (messageFromUser.startsWith("/change-setting")) {
+            return changeUserSettings(messageFromUser, chatId);
         } else if (messageFromUser.startsWith("/buy")) {
             return buySpot(messageFromUser, chatId);
         } else if (messageFromUser.startsWith("/sell")) {
@@ -38,16 +41,30 @@ public class NotSimpleCommandStrategy extends NoCommandAnswer {
 
     private String registerUser(String message, Long chatId) {
         try {
-            var apiKeyAndMinPercent = message.split(" ")[1].split("/");
-            var apiKey = apiKeyAndMinPercent[0];
-            var minPercentOfPush = new BigDecimal(apiKeyAndMinPercent[1]);
+            var apiKey = message.split(" ")[1];
 
             var request = CreateUserRequestDto.builder()
                     .apiKey(apiKey)
-                    .minPercentOfPush(minPercentOfPush)
                     .tgId(chatId.toString())
                     .build();
             return userFeignClient.createUser(request);
+        } catch (Exception ex) {
+            return ERROR_MESSAGE;
+        }
+    }
+
+    public String changeUserSettings(String message, Long chatId) {
+        try {
+            var changeSetting = message.split(" ")[1].split("/");
+            var minPercentOfDump = new BigDecimal(changeSetting[0]);
+            var minPercentOfIncome = new BigDecimal(changeSetting[1]);
+
+            var requestDto = ChangeUserSettingsDto.builder()
+                    .tgId(chatId.toString())
+                    .minPercentOfDump(minPercentOfDump)
+                    .minPercentOfIncome(minPercentOfIncome)
+                    .build();
+            return userFeignClient.changeUserSettings(requestDto);
         } catch (Exception ex) {
             return ERROR_MESSAGE;
         }
