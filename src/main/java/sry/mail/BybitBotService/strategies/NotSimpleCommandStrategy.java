@@ -11,6 +11,7 @@ import sry.mail.BybitBotService.dto.CreateUserRequestDto;
 import sry.mail.BybitBotService.dto.PurchaseRequestDto;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
@@ -28,7 +29,7 @@ public class NotSimpleCommandStrategy extends NoCommandAnswer {
 
         if (messageFromUser.startsWith("/register")) {
             return registerUser(messageFromUser, chatId);
-        } else if (messageFromUser.startsWith("/change-setting")) {
+        } else if (messageFromUser.startsWith("/change_settings")) {
             return changeUserSettings(messageFromUser, chatId);
         } else if (messageFromUser.startsWith("/buy")) {
             return buySpot(messageFromUser, chatId);
@@ -56,13 +57,13 @@ public class NotSimpleCommandStrategy extends NoCommandAnswer {
     public String changeUserSettings(String message, Long chatId) {
         try {
             var changeSetting = message.split(" ")[1].split("/");
-            var minPercentOfDump = new BigDecimal(changeSetting[0]);
-            var minPercentOfIncome = new BigDecimal(changeSetting[1]);
+            var minPercentOfDump = changeSetting[0];
+            var minPercentOfIncome = changeSetting[1];
 
             var requestDto = ChangeUserSettingsDto.builder()
                     .tgId(chatId.toString())
-                    .minPercentOfDump(minPercentOfDump)
-                    .minPercentOfIncome(minPercentOfIncome)
+                    .minPercentOfDump(!Objects.equals(minPercentOfDump, "?") ? new BigDecimal(minPercentOfDump) : null)
+                    .minPercentOfIncome(!Objects.equals(minPercentOfIncome, "?") ? new BigDecimal(minPercentOfIncome) : null)
                     .build();
             return userFeignClient.changeUserSettings(requestDto);
         } catch (Exception ex) {

@@ -1,9 +1,7 @@
 package sry.mail.BybitBotService.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 import sry.mail.BybitBotService.dto.PurchaseRequestDto;
 
 @FeignClient(
@@ -13,6 +11,9 @@ import sry.mail.BybitBotService.dto.PurchaseRequestDto;
         path = "/api/v1/purchase"
 )
 public interface PurchaseFeignClient {
+
+    @GetMapping
+    String getUserPurchasesInfo(@RequestParam("tgId") String tgId);
 
     @PostMapping
     String createPurchase(@RequestBody PurchaseRequestDto requestDto);
