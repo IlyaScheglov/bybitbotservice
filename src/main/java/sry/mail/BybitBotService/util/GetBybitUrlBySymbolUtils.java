@@ -5,9 +5,9 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class GetBybitUrlBySymbolUtils {
 
-    private static final String BYBIT_SPOT_URL_FORMAT = "https://www.bybit.com/ru-RU/trade/spot/%s/%s";
+    private static final String BYBIT_LINEAR_FUTURES_URL_FORMAT = "https://www.bybit.com/trade/usdt/%s";
 
-    public static String getBybitSpotUrlBySymbol(String symbol) {
-        return String.format(BYBIT_SPOT_URL_FORMAT, symbol.substring(0, symbol.length() - 4), symbol.substring(symbol.length() - 4));
+    public static String getBybitLinearFuturesUrlBySymbol(String symbol) {
+        return String.format(BYBIT_LINEAR_FUTURES_URL_FORMAT, symbol);
     }
 }

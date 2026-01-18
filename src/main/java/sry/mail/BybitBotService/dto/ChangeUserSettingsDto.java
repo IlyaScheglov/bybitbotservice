@@ -12,6 +12,10 @@ import java.math.BigDecimal;
 public class ChangeUserSettingsDto {
 
     String tgId;
-    BigDecimal minPercentOfDump;
-    BigDecimal minPercentOfIncome;
+    BigDecimal longPercent;
+    Integer longMinutes;
+    BigDecimal shortPercent;
+    Integer shortMinutes;
+    BigDecimal dumpPercent;
+    Integer dumpMinutes;
 }

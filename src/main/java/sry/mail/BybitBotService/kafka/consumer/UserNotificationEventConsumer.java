@@ -15,8 +15,9 @@ import sry.mail.BybitBotService.util.GetBybitUrlBySymbolUtils;
 @RequiredArgsConstructor
 public class UserNotificationEventConsumer {
 
-    private static final String BUY_MESSAGE_TEMPLATE = "Привет, начался дамп спота %s, пора покупать, вот ссылка %s";
-    private static final String SELL_MESSAGE_TEMPLATE = "Привет, пора продавать спот %s вот ссылка %s";
+    private static final String LONG_MASSAGE_FORMAT = "Привет, лонг фьючерса %s, вот ссылка %s";
+    private static final String SHORT_MASSAGE_FORMAT = "Привет, шорт фьючерса %s, вот ссылка %s";
+    private static final String DUMP_MASSAGE_FORMAT = "Привет, дамп фьючерса %s, вот ссылка %s";
 
     private final ObjectMapper objectMapper;
     private final TelegramBotExecutor telegramBotExecutor;
@@ -30,10 +31,12 @@ public class UserNotificationEventConsumer {
             var symbol = payload.getSymbol();
             var userMessage = "";
             switch (payload.getType()) {
-                case BUY -> userMessage = String.format(BUY_MESSAGE_TEMPLATE, symbol,
-                        GetBybitUrlBySymbolUtils.getBybitSpotUrlBySymbol(symbol));
-                case SELL -> userMessage = String.format(SELL_MESSAGE_TEMPLATE, symbol,
-                        GetBybitUrlBySymbolUtils.getBybitSpotUrlBySymbol(symbol));
+                case LONG -> userMessage = String.format(LONG_MASSAGE_FORMAT, symbol,
+                        GetBybitUrlBySymbolUtils.getBybitLinearFuturesUrlBySymbol(symbol));
+                case SHORT -> userMessage = String.format(SHORT_MASSAGE_FORMAT, symbol,
+                        GetBybitUrlBySymbolUtils.getBybitLinearFuturesUrlBySymbol(symbol));
+                case DUMP -> userMessage = String.format(DUMP_MASSAGE_FORMAT, symbol,
+                        GetBybitUrlBySymbolUtils.getBybitLinearFuturesUrlBySymbol(symbol));
             }
 
             var sendMessage = SendMessage.builder()

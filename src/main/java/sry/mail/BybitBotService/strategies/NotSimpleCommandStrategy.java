@@ -4,14 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import ru.ilyxxxa.server.telegrambotstarter.strategy.NoCommandAnswer;
-import sry.mail.BybitBotService.client.PurchaseFeignClient;
 import sry.mail.BybitBotService.client.UserFeignClient;
 import sry.mail.BybitBotService.dto.ChangeUserSettingsDto;
 import sry.mail.BybitBotService.dto.CreateUserRequestDto;
-import sry.mail.BybitBotService.dto.PurchaseRequestDto;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -20,7 +20,6 @@ public class NotSimpleCommandStrategy extends NoCommandAnswer {
     private static final String ERROR_MESSAGE = "Произошла ошибка";
 
     private final UserFeignClient userFeignClient;
-    private final PurchaseFeignClient purchaseFeignClient;
 
     @Override
     public String answer(Message message) {
@@ -31,10 +30,6 @@ public class NotSimpleCommandStrategy extends NoCommandAnswer {
             return registerUser(messageFromUser, chatId);
         } else if (messageFromUser.startsWith("/change_settings")) {
             return changeUserSettings(messageFromUser, chatId);
-        } else if (messageFromUser.startsWith("/buy")) {
-            return buySpot(messageFromUser, chatId);
-        } else if (messageFromUser.startsWith("/sell")) {
-            return sellSpot(messageFromUser, chatId);
         } else {
             return "Неизвестная команда";
         }
@@ -56,42 +51,22 @@ public class NotSimpleCommandStrategy extends NoCommandAnswer {
 
     public String changeUserSettings(String message, Long chatId) {
         try {
-            var changeSetting = message.split(" ")[1].split("/");
-            var minPercentOfDump = changeSetting[0];
-            var minPercentOfIncome = changeSetting[1];
+            var settingsMap = Arrays.stream(message.split(" ")[1].split("&"))
+                    .map(str -> str.split("="))
+                    .collect(Collectors.toMap(setting -> setting[0], setting -> setting[1]));
 
             var requestDto = ChangeUserSettingsDto.builder()
                     .tgId(chatId.toString())
-                    .minPercentOfDump(!Objects.equals(minPercentOfDump, "?") ? new BigDecimal(minPercentOfDump) : null)
-                    .minPercentOfIncome(!Objects.equals(minPercentOfIncome, "?") ? new BigDecimal(minPercentOfIncome) : null)
+                    .longPercent(settingsMap.containsKey("lp") ? new BigDecimal(settingsMap.get("lp")) : null)
+                    .shortPercent(settingsMap.containsKey("sp") ? new BigDecimal(settingsMap.get("sp")) : null)
+                    .dumpPercent(settingsMap.containsKey("dp") ? new BigDecimal(settingsMap.get("dp")) : null)
+                    .longMinutes(settingsMap.containsKey("lm") ? Integer.parseInt(settingsMap.get("lm")) : null)
+                    .shortMinutes(settingsMap.containsKey("sm") ? Integer.parseInt(settingsMap.get("sm")) : null)
+                    .dumpMinutes(settingsMap.containsKey("dm") ? Integer.parseInt(settingsMap.get("dm")) : null)
                     .build();
             return userFeignClient.changeUserSettings(requestDto);
         } catch (Exception ex) {
             return ERROR_MESSAGE;
         }
-    }
-
-    private String buySpot(String message, Long chatId) {
-        try {
-            return purchaseFeignClient.createPurchase(createPurchaseRequestDto(message, chatId));
-        } catch (Exception ex) {
-            return ERROR_MESSAGE;
-        }
-    }
-
-    private String sellSpot(String message, Long chatId) {
-        try {
-            return purchaseFeignClient.deletePurchase(createPurchaseRequestDto(message, chatId));
-        } catch (Exception ex) {
-            return ERROR_MESSAGE;
-        }
-    }
-
-    private PurchaseRequestDto createPurchaseRequestDto(String message, Long chatId) {
-        var symbol = message.split(" ")[1];
-        return PurchaseRequestDto.builder()
-                .symbol(symbol)
-                .tgId(chatId.toString())
-                .build();
     }
 }

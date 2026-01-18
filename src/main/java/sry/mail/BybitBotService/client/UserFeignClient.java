@@ -16,6 +16,9 @@ public interface UserFeignClient {
     @PostMapping
     String createUser(@RequestBody CreateUserRequestDto requestDto);
 
+    @GetMapping
+    String getUserSettings(@RequestParam("tgId") String tgId);
+
     @PutMapping
     String changeUserSettings(@RequestBody ChangeUserSettingsDto requestDto);
 
